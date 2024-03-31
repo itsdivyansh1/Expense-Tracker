@@ -8,6 +8,7 @@ import tkinter.messagebox as messagebox
 
 matplotlib.use('TkAgg')
 
+
 class BudgetApp(ctk.CTk):
     def __init__(self):
         super().__init__()
@@ -97,7 +98,8 @@ class BudgetApp(ctk.CTk):
         expense_entry.pack(pady=10)
 
         # Add daily expense button
-        daily_expense_button = ctk.CTkButton(self.expense_frame, text="Add Daily Expense", command=self.add_daily_expense)
+        daily_expense_button = ctk.CTkButton(self.expense_frame, text="Add Daily Expense",
+                                             command=self.add_daily_expense)
         daily_expense_button.pack(pady=10)
 
         # Add custom category button
@@ -147,7 +149,8 @@ class BudgetApp(ctk.CTk):
 
             total_expenses_today = sum(self.daily_expenses[date].values()) + float(expense)
             if total_expenses_today > self.monthly_income:
-                messagebox.showerror("Error", f"Your total expenses for today ({total_expenses_today}) exceed your monthly income ({self.monthly_income}). Please adjust your expenses accordingly.")
+                messagebox.showerror("Error",
+                                     f"Your total expenses for today ({total_expenses_today}) exceed your monthly income ({self.monthly_income}). Please adjust your expenses accordingly.")
                 return
 
             self.daily_expenses[date][selected_category] += float(expense)
@@ -207,7 +210,8 @@ class BudgetApp(ctk.CTk):
         self.bar_chart.draw()
 
     def create_category_list(self):
-        self.category_scrollable_frame = ctk.CTkScrollableFrame(self.category_tab.tab("Categories"), label_text="Categories")
+        self.category_scrollable_frame = ctk.CTkScrollableFrame(self.category_tab.tab("Categories"),
+                                                                label_text="Categories")
         self.category_scrollable_frame.pack(pady=10, padx=10, fill="both", expand=True)
 
         self.category_frames = []
@@ -223,7 +227,9 @@ class BudgetApp(ctk.CTk):
         category_label = ctk.CTkLabel(category_frame, text=category)
         category_label.pack(side="left", padx=10)
 
-        delete_button = ctk.CTkButton(master=category_frame, image=delete_image, text="", fg_color="#ff2e38", hover_color="#b30009", width=16, height=16, command=lambda c=category: self.delete_category(c))
+        delete_button = ctk.CTkButton(master=category_frame, image=delete_image, text="", fg_color="#ff2e38",
+                                      hover_color="#b30009", width=16, height=16,
+                                      command=lambda c=category: self.delete_category(c))
         delete_button.pack(side="right", padx=10)
 
         self.category_frames.append(category_frame)
@@ -247,18 +253,21 @@ class BudgetApp(ctk.CTk):
         recurring_category_label = ctk.CTkLabel(self.monthly_expenses_frame, text="Recurring Category and Expense")
         recurring_category_label.pack(pady=10)
 
-        self.recurring_category_combobox = ctk.CTkComboBox(self.monthly_expenses_frame, values=self.recurring_categories, state="readonly")
+        self.recurring_category_combobox = ctk.CTkComboBox(self.monthly_expenses_frame,
+                                                           values=self.recurring_categories, state="readonly")
         self.recurring_category_combobox.pack(pady=10)
 
         recurring_expense_entry = ctk.CTkEntry(self.monthly_expenses_frame, placeholder_text="Expense")
         recurring_expense_entry.pack(pady=10)
 
         # Add recurring expense button
-        add_recurring_expense_button = ctk.CTkButton(self.monthly_expenses_frame, text="Add Recurring Expense", command=self.add_recurring_expense)
+        add_recurring_expense_button = ctk.CTkButton(self.monthly_expenses_frame, text="Add Recurring Expense",
+                                                     command=self.add_recurring_expense)
         add_recurring_expense_button.pack(pady=10)
 
         # Add custom recurring category button
-        add_recurring_category_button = ctk.CTkButton(self.monthly_expenses_frame, text="Add Recurring Category", command=self.add_custom_recurring_category)
+        add_recurring_category_button = ctk.CTkButton(self.monthly_expenses_frame, text="Add Recurring Category",
+                                                      command=self.add_custom_recurring_category)
         add_recurring_category_button.pack(pady=10)
 
         # Monthly expenses table
@@ -289,6 +298,7 @@ class BudgetApp(ctk.CTk):
         if category:
             self.recurring_categories.append(category)
             self.recurring_category_combobox.configure(require_redraw=True, values=self.recurring_categories)
+
 
 if __name__ == "__main__":
     app = BudgetApp()
