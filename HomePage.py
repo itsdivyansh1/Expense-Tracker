@@ -9,7 +9,7 @@ import tkinter.messagebox as messagebox
 matplotlib.use('TkAgg')
 
 
-class BudgetApp(ctk.CTk):
+class ExpenseTracker(ctk.CTk):
     def __init__(self):
         super().__init__()
         self.title("Budget App")
@@ -301,5 +301,5 @@ class BudgetApp(ctk.CTk):
 
 
 if __name__ == "__main__":
-    app = BudgetApp()
+    app = ExpenseTracker()
     app.mainloop()
