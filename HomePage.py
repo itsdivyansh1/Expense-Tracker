@@ -9,7 +9,6 @@ import mysql.connector
 
 matplotlib.use('TkAgg')
 
-
 def connect_to_db():
     try:
         conn = mysql.connector.connect(
@@ -23,7 +22,6 @@ def connect_to_db():
         print(f"Error connecting to MySQL: {e}")
         return None
 
-
 def insert_daily_expense(date, category, expense):
     conn = connect_to_db()
     if conn:
@@ -34,7 +32,6 @@ def insert_daily_expense(date, category, expense):
         conn.commit()
         cursor.close()
         conn.close()
-
 
 def insert_monthly_expense(category, expense):
     conn = connect_to_db()
@@ -47,7 +44,6 @@ def insert_monthly_expense(category, expense):
         cursor.close()
         conn.close()
 
-
 def insert_category(category):
     conn = connect_to_db()
     if conn:
@@ -58,7 +54,6 @@ def insert_category(category):
         conn.commit()
         cursor.close()
         conn.close()
-
 
 def get_categories():
     conn = connect_to_db()
@@ -72,7 +67,6 @@ def get_categories():
         return results
     return []
 
-
 def delete_category(category):
     conn = connect_to_db()
     if conn:
@@ -84,7 +78,6 @@ def delete_category(category):
         cursor.close()
         conn.close()
 
-
 class ExpenseTracker(ctk.CTk):
     def __init__(self):
         super().__init__()
@@ -93,6 +86,7 @@ class ExpenseTracker(ctk.CTk):
 
         # Get monthly income
         self.monthly_income = self.get_monthly_income()
+        self.total_spend = 0
 
         # Initialize categories
         self.categories = get_categories()
@@ -131,11 +125,7 @@ class ExpenseTracker(ctk.CTk):
         # Create category list
         self.create_category_list()
 
-        # Display monthly income
-        income_label = ctk.CTkLabel(self.expense_frame, text=f"Budget: ₹{self.monthly_income}")
-        income_label.pack(pady=10)
-
-        # Create input widgets for expenses
+        # Create expense input widgets
         self.create_expense_input_widgets()
 
         # Create pie chart
@@ -183,6 +173,19 @@ class ExpenseTracker(ctk.CTk):
         self.expense_table.bind("<Key>", lambda e: "break")
         self.expense_table.pack(pady=10, fill="both", expand=True)
 
+        # Budget labels
+        budget_frame = ctk.CTkFrame(self.expense_frame)
+        budget_frame.pack(pady=10)
+
+        income_label = ctk.CTkLabel(budget_frame, text=f"Budget: ₹{self.monthly_income}")
+        income_label.pack(side="left", padx=10)
+
+        self.total_spend_label = ctk.CTkLabel(budget_frame, text=f"Total Spend: ₹{self.total_spend}")
+        self.total_spend_label.pack(side="left", padx=10)
+
+        self.remaining_money_label = ctk.CTkLabel(budget_frame, text=f"Remaining: ₹{self.monthly_income - self.total_spend}")
+        self.remaining_money_label.pack(side="left", padx=10)
+
         # Set expense entry and add expense button
         self.expense_entry = expense_entry
         self.add_expense_button = daily_expense_button
@@ -192,7 +195,6 @@ class ExpenseTracker(ctk.CTk):
         self.pie_ax = self.pie_figure.add_subplot(111)
         self.pie_chart = FigureCanvasTkAgg(self.pie_figure, frame)
         self.pie_chart.get_tk_widget().pack(side="top", fill="both", expand=True)
-
 
     def create_bar_chart(self, frame):
         self.bar_figure = Figure(figsize=(5, 5), dpi=100)
@@ -211,7 +213,6 @@ class ExpenseTracker(ctk.CTk):
             self.categories_expenses[category] = 0  # Add new category to categories_expenses
             self.add_category_frame(category)  # Add the new category frame
 
-
     def add_daily_expense(self):
         selected_category = self.category_combobox.get()
         expense = self.expense_entry.get()
@@ -219,9 +220,9 @@ class ExpenseTracker(ctk.CTk):
 
         if selected_category and expense:
             total_expenses_today = float(expense)
-            if total_expenses_today > self.monthly_income:
+            if total_expenses_today > self.monthly_income - self.total_spend:
                 messagebox.showerror("Error",
-                                     f"Your total expenses for today ({total_expenses_today}) exceed your monthly income ({self.monthly_income}). Please adjust your expenses accordingly.")
+                                     f"Your total expenses for today ({total_expenses_today}) exceed your remaining budget ({self.monthly_income - self.total_spend}). Please adjust your expenses accordingly.")
                 return
 
             insert_daily_expense(date, selected_category, float(expense))
@@ -230,6 +231,8 @@ class ExpenseTracker(ctk.CTk):
             self.expense_entry.delete(0, "end")
             self.update_pie_chart(date)
             self.update_bar_chart()
+            self.update_total_spend(float(expense))
+            self.update_remaining_money()
 
     def update_pie_chart(self, date):
         conn = connect_to_db()
@@ -296,6 +299,14 @@ class ExpenseTracker(ctk.CTk):
             self.bar_ax.set_title("Daily Expenses")
             self.bar_ax.legend()
             self.bar_chart.draw()
+
+    def update_total_spend(self, expense):
+        self.total_spend += expense
+        self.total_spend_label.configure(text=f"Total Spend: ₹{self.total_spend}")
+
+    def update_remaining_money(self):
+        remaining_money = self.monthly_income - self.total_spend
+        self.remaining_money_label.configure(text=f"Remaining: ₹{remaining_money}")
 
     def create_category_list(self):
         self.category_scrollable_frame = ctk.CTkScrollableFrame(self.category_tab.tab("Categories"),
@@ -384,7 +395,6 @@ class ExpenseTracker(ctk.CTk):
         if category:
             self.recurring_categories.append(category)
             self.recurring_category_combobox.configure(require_redraw=True, values=self.recurring_categories)
-
 
 if __name__ == "__main__":
     app = ExpenseTracker()
