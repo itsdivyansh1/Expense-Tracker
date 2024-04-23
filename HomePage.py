@@ -138,12 +138,12 @@ class ExpenseTracker(ctk.CTk):
         self.create_recurring_categories_input_widgets()
 
     def get_monthly_income(self):
-        income_dialog = ctk.CTkInputDialog(text="Enter your monthly income:", title="Monthly Income")
+        income_dialog = ctk.CTkInputDialog(text="Enter your monthly budget:", title="Monthly Budget")
         income = income_dialog.get_input()
 
         while not income or not income.isdigit():
-            income_dialog = ctk.CTkInputDialog(text="Please enter a valid number for your monthly income:",
-                                               title="Monthly Income")
+            income_dialog = ctk.CTkInputDialog(text="Please enter a valid number for your monthly Budget:",
+                                               title="Monthly Budget")
             income = income_dialog.get_input()
 
         return int(income)
